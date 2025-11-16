@@ -1,7 +1,8 @@
 import { Stack } from 'expo-router';
-import { StatusBar } from 'expo-status-bar';
-import "@/src/shared/styles/global.css"
-import {SafeAreaProvider, SafeAreaView} from "react-native-safe-area-context";
+
+
+import {SafeAreaProvider} from "react-native-safe-area-context";
+import 'react-native-reanimated';
 
 export default function RootLayout() {
   return (

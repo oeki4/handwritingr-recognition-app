@@ -1,5 +1,5 @@
 import {StyleSheet, View, Text} from 'react-native';
-import {Inner} from "@/src/shared/ui";
+import Inner from "@/src/shared/ui/inner/Inner";
 
 export default function TabTwoScreen() {
   return (
