@@ -85,7 +85,7 @@ def initialize_recognition_model():
                 return y_pred
 
         base_model = keras.models.load_model(
-            "checkpoint_best.h5",
+            "model.h5",
             custom_objects={"CTCLayer": CTCLayer},
             compile=False
         )

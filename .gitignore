@@ -1,2 +1,4 @@
 .idea
 /mobile-app/yarn.lock
+/mobile-app/api_results
+/mobile-app/__pycache__
