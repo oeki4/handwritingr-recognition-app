@@ -69,9 +69,9 @@ export default function UIButton(props: IProps) {
           end={{ x: 1, y: 1 }}
           style={staticStyles.button}
         >
-          {LeftIcon && <LeftIcon width={40} height={40} />}
+          {LeftIcon && <LeftIcon color={"#ffffff"} width={16} height={16} />}
 
-          <UIText size={16} color="#ffffff" weight={500}>
+          <UIText size={16} color="#ffffff" weight={400}>
             {children}
           </UIText>
         </LinearGradient>
@@ -90,5 +90,7 @@ const staticStyles = StyleSheet.create({
     borderRadius: 12,
     justifyContent: "center",
     alignItems: "center",
+    flexDirection: "row",
+    gap: 8,
   },
 });
