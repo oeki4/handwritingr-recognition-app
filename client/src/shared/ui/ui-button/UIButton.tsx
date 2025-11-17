@@ -1,4 +1,10 @@
-import { Pressable, PressableProps, StyleSheet, ViewStyle } from "react-native";
+import {
+  Pressable,
+  PressableProps,
+  StyleSheet,
+  View,
+  ViewStyle,
+} from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { FC, ReactNode } from "react";
 import UIText from "@/src/shared/ui/ui-text/UIText";
@@ -51,8 +57,25 @@ export default function UIButton(props: IProps) {
     opacity.value = withTiming(1, { duration: 120 });
   };
 
-  const gradientColors: Record<ButtonColor, [string, string]> = {
-    emerald: ["#00d492", "#009966"] as const,
+  const gradientColors: Record<
+    ButtonColor,
+    {
+      backgroundColor: [string, string] | string;
+      borderColor?: string;
+    }
+  > = {
+    emerald: {
+      backgroundColor: ["#00d492", "#009966"] as const,
+      borderColor: "#00d492",
+    },
+  };
+  const textColors: Record<ButtonVariant, string> = {
+    contained: "#ffffff",
+    outlined: "#000000",
+  };
+  const iconColors: Record<ButtonVariant, string> = {
+    contained: "#ffffff",
+    outlined: "#000000",
   };
 
   return (
@@ -64,19 +87,34 @@ export default function UIButton(props: IProps) {
     >
       {isContained ? (
         <LinearGradient
-          colors={gradientColors[color]}
+          colors={gradientColors[color].backgroundColor}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
           style={staticStyles.button}
         >
-          {LeftIcon && <LeftIcon color={"#ffffff"} width={16} height={16} />}
+          {LeftIcon && (
+            <LeftIcon color={iconColors[variant]} width={16} height={16} />
+          )}
 
-          <UIText size={16} color="#ffffff" weight={400}>
+          <UIText size={14} color={textColors[variant]} weight={400}>
             {children}
           </UIText>
         </LinearGradient>
       ) : (
-        <UIText size={16}>{children}</UIText>
+        <View
+          style={StyleSheet.compose(staticStyles.button, {
+            borderStyle: "solid",
+            borderWidth: 1,
+            borderColor: gradientColors[color].borderColor,
+          })}
+        >
+          {LeftIcon && (
+            <LeftIcon color={iconColors[variant]} width={16} height={16} />
+          )}
+          <UIText color={textColors[variant]} size={14}>
+            {children}
+          </UIText>
+        </View>
       )}
     </AnimatedPressable>
   );
@@ -91,6 +129,6 @@ const staticStyles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     flexDirection: "row",
-    gap: 8,
+    gap: 16,
   },
 });

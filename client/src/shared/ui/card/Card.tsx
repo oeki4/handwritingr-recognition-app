@@ -1,25 +1,24 @@
-import {StyleSheet, View, Text} from "react-native";
-import {ReactNode} from "react";
+import { StyleSheet, View, ViewStyle } from "react-native";
+import { ReactNode } from "react";
 
 interface IProps {
-	children?: ReactNode;
+  children?: ReactNode;
+  style?: ViewStyle;
 }
 
 export default function Card(props: IProps) {
-	const {children} = props;
-	return (
-		<View style={staticStyles.card}>
-			{children}
-		</View>
-	)
+  const { children, style } = props;
+  return (
+    <View style={StyleSheet.compose(staticStyles.card, style)}>{children}</View>
+  );
 }
 
 const staticStyles = StyleSheet.create({
-	card: {
-		backgroundColor: "#FFFFFE",
-		elevation: 12,
-		shadowColor: 'rgba(0,0,0,0.1)',
-		padding: 32,
-		borderRadius: 10,
-	}
-})
+  card: {
+    backgroundColor: "#FFFFFE",
+    elevation: 12,
+    shadowColor: "rgba(0,0,0,0.1)",
+    padding: 32,
+    borderRadius: 10,
+  },
+});
