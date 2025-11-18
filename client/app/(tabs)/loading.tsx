@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Image, StyleSheet, View } from "react-native";
 import Animated, {
   Easing,
@@ -9,78 +9,118 @@ import Animated, {
 } from "react-native-reanimated";
 import Inner from "@/src/shared/ui/inner/Inner";
 import Card from "@/src/shared/ui/card/Card";
-import { useLocalSearchParams } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
 import UIText from "@/src/shared/ui/ui-text/UIText";
 import AppIcon from "@/src/shared/assets/svg/app-icon.svg";
+import * as FileSystem from "expo-file-system/legacy";
+
+import axios from "axios";
 
 export default function LoadingScanScreen() {
   const { imageUrl } = useLocalSearchParams();
+  const router = useRouter();
 
   const translateY = useSharedValue(0);
   const scanHeight = useSharedValue(0);
   const pulseOpacity = useSharedValue(0.3);
-  const rotation = useSharedValue(0); // Добавляем значение для вращения
+  const rotation = useSharedValue(0);
 
   const LINE_HEIGHT = 3;
   const DURATION = 1000;
   const PULSE_DURATION = 1000;
-  const ROTATION_DURATION = 2000; // Длительность полного оборота
+  const ROTATION_DURATION = 2000;
 
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [{ translateY: translateY.value }],
   }));
 
-  const gradientAnimatedStyle = useAnimatedStyle(() => {
-    return {
-      opacity: pulseOpacity.value,
-    };
-  });
+  const gradientAnimatedStyle = useAnimatedStyle(() => ({
+    opacity: pulseOpacity.value,
+  }));
 
-  // Анимированный стиль для вращения иконки
-  const iconAnimatedStyle = useAnimatedStyle(() => {
-    return {
-      transform: [{ rotate: `${rotation.value}deg` }],
-    };
-  });
+  const iconAnimatedStyle = useAnimatedStyle(() => ({
+    transform: [{ rotate: `${rotation.value}deg` }],
+  }));
 
-  // запуск анимации после измерения высоты
+  // ---------- ЗАПРОС НА backend ----------
+
+  const sendImage = async () => {
+    try {
+      const fileUri = String(imageUrl);
+
+      const fileInfo = await FileSystem.getInfoAsync(fileUri);
+      if (!fileInfo.exists) {
+        console.warn("Файл не найден по пути:", fileUri);
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append("file", {
+        uri: fileUri,
+        type: "image/jpeg",
+        name: "uploaded.jpg",
+      });
+
+      const response = await axios.post(
+        "https://56z0sd-46-164-220-216.ru.tuna.am/recognize?return_image=true",
+        formData,
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+        },
+      );
+
+      console.log("Ответ сервера:", response.data);
+
+      router.push({
+        pathname: "/result",
+        params: {
+          imageUrl: fileUri,
+          result: JSON.stringify(response.data),
+        },
+      });
+    } catch (error) {
+      console.error("Ошибка загрузки:", error);
+    }
+  };
+
+  // --------- Старт при загрузке ----------
+  useEffect(() => {
+    sendImage();
+  }, [imageUrl]);
+
+  // Анимации
   const onImageLayout = (e) => {
     const h = e.nativeEvent.layout.height;
-    // сохраняем высоту (можно использовать, если нужно)
     scanHeight.value = h;
 
-    // стартуем линию чуть выше, чтобы сначала шла сверху
     translateY.value = -LINE_HEIGHT;
 
-    // двигаем до нижней границы (h - LINE_HEIGHT), затем обратно, бесконечно
     translateY.value = withRepeat(
       withTiming(Math.max(0, h - LINE_HEIGHT), {
         duration: DURATION,
         easing: Easing.linear,
       }),
-      -1, // infinite
-      true, // reverse
+      -1,
+      true,
     );
 
-    // запускаем пульсацию градиента
     pulseOpacity.value = withRepeat(
       withTiming(0.5, {
         duration: PULSE_DURATION,
         easing: Easing.inOut(Easing.ease),
       }),
-      -1, // infinite
-      true, // reverse
+      -1,
+      true,
     );
 
-    // запускаем вращение иконки
     rotation.value = withRepeat(
       withTiming(360, {
         duration: ROTATION_DURATION,
         easing: Easing.linear,
       }),
-      -1, // infinite
-      false, // не реверсировать - сразу начинать новый цикл
+      -1,
+      false,
     );
   };
 
@@ -88,14 +128,12 @@ export default function LoadingScanScreen() {
     <Inner style={styles.inner}>
       <Card>
         <View style={styles.imageWrapper} onLayout={onImageLayout}>
-          {/* Если imageUrl не передан — можно показать плейсхолдер */}
           <Image
             source={{ uri: String(imageUrl) }}
             style={styles.image}
             resizeMode="cover"
           />
 
-          {/* Мигающий зеленый градиент */}
           <Animated.View
             style={[styles.gradientOverlay, gradientAnimatedStyle]}
           >
@@ -113,24 +151,17 @@ export default function LoadingScanScreen() {
 
           <Animated.View style={[styles.scanLine, animatedStyle]} />
         </View>
+
         <View style={styles.description}>
           <Animated.View style={iconAnimatedStyle}>
             <AppIcon width={50} color={"#00a63e"} height={50} />
           </Animated.View>
-          <UIText
-            style={{
-              textAlign: "center",
-            }}
-            size={14}
-          >
+
+          <UIText style={{ textAlign: "center" }} size={14}>
             Анализ изображения
           </UIText>
-          <UIText
-            style={{
-              textAlign: "center",
-            }}
-            size={14}
-          >
+
+          <UIText style={{ textAlign: "center" }} size={14}>
             Модель машинного обучения распознает текст...
           </UIText>
         </View>
@@ -147,13 +178,11 @@ const styles = StyleSheet.create({
     position: "relative",
     borderRadius: 10,
   },
-
   image: {
     width: "100%",
     height: "100%",
     borderRadius: 10,
   },
-
   scanLine: {
     position: "absolute",
     top: 0,
@@ -164,7 +193,6 @@ const styles = StyleSheet.create({
     opacity: 0.9,
     zIndex: 2,
   },
-
   gradientOverlay: {
     position: "absolute",
     top: 0,
@@ -174,7 +202,6 @@ const styles = StyleSheet.create({
     zIndex: 1,
     backgroundColor: "white",
   },
-
   gradient: {
     width: "100%",
     height: "100%",
@@ -189,7 +216,6 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   inner: {
-    display: "flex",
     flexDirection: "column",
     justifyContent: "center",
   },

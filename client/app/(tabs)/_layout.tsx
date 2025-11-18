@@ -6,6 +6,7 @@ export default function TabLayout() {
     <Tabs
       screenOptions={{
         headerShown: false,
+        tabBarStyle: { display: "none" },
       }}
     >
       <Tabs.Screen
@@ -15,15 +16,15 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="explore"
-        options={{
-          title: "Explore",
-        }}
-      />
-      <Tabs.Screen
         name="loading"
         options={{
           title: "Loading",
+        }}
+      />
+      <Tabs.Screen
+        name="result"
+        options={{
+          title: "Result",
         }}
       />
     </Tabs>

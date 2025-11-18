@@ -18,7 +18,7 @@ const staticStyles = StyleSheet.create({
     backgroundColor: "#FFFFFE",
     elevation: 12,
     shadowColor: "rgba(0,0,0,0.1)",
-    padding: 32,
+    padding: 16,
     borderRadius: 10,
   },
 });

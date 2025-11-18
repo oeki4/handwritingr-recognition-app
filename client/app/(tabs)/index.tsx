@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { StyleSheet, View } from "react-native";
 import Inner from "@/src/shared/ui/inner/Inner";
 import Card from "@/src/shared/ui/card/Card";
@@ -13,30 +13,50 @@ import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 
 export default function HomeScreen() {
-  const [image, setImage] = useState<string | null>(null);
   const router = useRouter();
 
   const openCameraAndCrop = () => {
     ImagePicker.openCamera({
-      width: 300,
-      height: 400,
       cropping: true,
       freeStyleCropEnabled: true,
       includeBase64: true,
-      cropperToolbarTitle: "Сделайте фото текста",
+      cropperToolbarTitle: "Сфотографируйте текст",
     })
       .then((image) => {
-        console.log(image);
         if (!image) return;
+
         router.push({
           pathname: "/loading",
-          params: {
-            imageUrl: image.path,
-          },
+          params: { imageUrl: image.path },
         });
       })
       .catch((error) => {
-        console.log("Error opening camera:", error);
+        console.log(error);
+        router.push({
+          pathname: "/error",
+        });
+      });
+  };
+
+  const openGalleryAndCrop = () => {
+    ImagePicker.openPicker({
+      cropping: true,
+      freeStyleCropEnabled: true,
+      includeBase64: true,
+      mediaType: "photo",
+      multiple: false, // выбрать одно фото
+      cropperToolbarTitle: "Обрежьте фото",
+    })
+      .then((image) => {
+        if (!image) return;
+
+        router.push({
+          pathname: "/loading",
+          params: { imageUrl: image.path },
+        });
+      })
+      .catch((error) => {
+        console.log("Error opening gallery:", error);
       });
   };
 
@@ -65,11 +85,7 @@ export default function HomeScreen() {
         >
           Сделать фото
         </UIButton>
-        {/*{image && (*/}
-        {/*  <View style={styles.imageContainer}>*/}
-        {/*    <Image source={{ uri: image }} style={styles.image} />*/}
-        {/*  </View>*/}
-        {/*)}*/}
+
         <View style={styles.dividerBlock}>
           <View style={styles.dividerItem}></View>
           <UIText size={14}>или</UIText>
@@ -80,11 +96,12 @@ export default function HomeScreen() {
           style={styles.button}
           leftIcon={UploadIcon}
           variant="outlined"
-          onPress={openCameraAndCrop}
+          onPress={openGalleryAndCrop}
         >
           Загрузить из галереи
         </UIButton>
       </Card>
+
       <View style={styles.icons}>
         <View style={styles.iconBlock}>
           <View style={styles.iconImage}>
@@ -135,7 +152,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   dividerItem: {
-    maxWidth: "100%",
     flexGrow: 1,
     height: 1,
     backgroundColor: "#e5e7eb",
@@ -151,7 +167,6 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     display: "flex",
-    flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
     borderRadius: 24,
@@ -167,14 +182,11 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
   icons: {
-    display: "flex",
     width: "100%",
     flexDirection: "row",
     justifyContent: "space-between",
   },
   iconBlock: {
-    display: "flex",
-    flexDirection: "column",
     alignItems: "center",
     gap: 8,
   },
@@ -185,6 +197,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "#dcfce7",
-    borderRadius: "100%",
+    borderRadius: 100,
   },
 });

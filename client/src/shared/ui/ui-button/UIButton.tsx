@@ -122,10 +122,10 @@ export default function UIButton(props: IProps) {
 
 const staticStyles = StyleSheet.create({
   button: {
-    minHeight: 56,
+    minHeight: 48,
     paddingVertical: 8,
     paddingHorizontal: 12,
-    borderRadius: 12,
+    borderRadius: 8,
     justifyContent: "center",
     alignItems: "center",
     flexDirection: "row",
