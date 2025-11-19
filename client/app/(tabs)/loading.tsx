@@ -16,6 +16,7 @@ import AppIcon from "@/src/shared/assets/svg/app-icon.svg";
 import * as FileSystem from "expo-file-system/legacy";
 
 import axios from "axios";
+import { API_URL } from "@/src/shared/config/config";
 
 export default function LoadingScanScreen() {
   const { imageUrl } = useLocalSearchParams();
@@ -63,7 +64,7 @@ export default function LoadingScanScreen() {
       });
 
       const response = await axios.post(
-        "https://56z0sd-46-164-220-216.ru.tuna.am/recognize?return_image=true",
+        `${API_URL}/recognize?return_image=true`,
         formData,
         {
           headers: { "Content-Type": "multipart/form-data" },
@@ -131,7 +132,7 @@ export default function LoadingScanScreen() {
           <Image
             source={{ uri: String(imageUrl) }}
             style={styles.image}
-            resizeMode="cover"
+            resizeMode="stretch"
           />
 
           <Animated.View

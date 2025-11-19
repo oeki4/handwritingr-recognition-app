@@ -31,10 +31,17 @@ export default function HomeScreen() {
         });
       })
       .catch((error) => {
+        const isCancelled =
+          error.toString().includes("User cancelled") ||
+          error.message?.includes("cancelled");
+
+        if (isCancelled) {
+          return;
+        }
+
+        // Другие ошибки
         console.log(error);
-        router.push({
-          pathname: "/error",
-        });
+        router.push("/error");
       });
   };
 
@@ -56,7 +63,17 @@ export default function HomeScreen() {
         });
       })
       .catch((error) => {
-        console.log("Error opening gallery:", error);
+        const isCancelled =
+          error.toString().includes("User cancelled") ||
+          error.message?.includes("cancelled");
+
+        if (isCancelled) {
+          return;
+        }
+
+        // Другие ошибки
+        console.log(error);
+        router.push("/error");
       });
   };
 
